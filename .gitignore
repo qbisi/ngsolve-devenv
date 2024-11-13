@@ -1,0 +1,11 @@
+# Ignore everything
+*
+
+# But not these files:
+!.envrc
+!.gitignore
+!flake.lock
+!*.nix
+!pytest/
+!pytest/*.*
+pytest/*/
