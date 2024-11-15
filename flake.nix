@@ -1,6 +1,14 @@
 {
   description = "A basic flake with a shell";
 
+  # --- Flake Local Nix Configuration ----------------------------
+  nixConfig = {
+    # This sets the flake to use the IOG nix cache.
+    # Nix should ask for permission before using it,
+    # but remove it here if you do not want it to.
+    experimental-features = [ "nix-command" "flakes" ];
+  };
+
   inputs = {
     # nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs.url = "github:qbisi/nixpkgs/ngsolve";
