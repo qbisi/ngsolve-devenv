@@ -27,25 +27,23 @@
           ...
         }:
         {
-          _module.args.pkgs = import inputs.nixpkgs {
-            inherit system;
-            overlays = [
-              (final: prev: {
-                # stdenv = prev.stdenv.overrideAttrs { avxSupport = true; };
-                netgen = prev.netgen.override { avxSupport = true; };
-              })
-            ];
-            config = { };
+          _module.args = {
+            pkgs = import inputs.nixpkgs {
+              inherit system;
+              overlays = [
+                (final: prev: {
+                  # stdenv = prev.stdenv.overrideAttrs { avxSupport = true; };
+                  netgen = prev.netgen.override { avxSupport = true; };
+                })
+              ];
+              config = { };
+            };
           };
           devShells = rec {
-            default = python;
-
-            python = pkgs.mkShell {
-              packages = with pkgs; [
-                self'.packages.ngsolve-env
-              ];
+            default = pkgs.mkShell {
+              packages = [ self'.packages.ngsolve-env ];
               shellHook = ''
-                export PYTHONPATH=$PWD/.pip:$PYTHONPATH
+                # export PYTHONPATH=$PWD/.pip:$PYTHONPATH
                 rm -rf .python-env
                 ln -s ${self'.packages.ngsolve-env} .python-env
               '';
@@ -54,19 +52,20 @@
 
           packages = {
             inherit (pkgs) netgen ngsolve;
+
+            webgui-jupyter-widget = pkgs.python312Packages.callPackage ./webgui-jupyter-widget.nix { };
+
             ngsolve-env = pkgs.jupyter.withPackages (
               ps: with ps; [
                 ngsolve
-                matplotlib
+                # matplotlib
+                notebook
                 ipykernel
                 pytest
-                notebook
                 pip
+                self'.packages.webgui-jupyter-widget
               ]
             );
-            # webgui = pkgs.callPackage ./webgui.nix { };
-
-            # webgui-jupyter-widget = pkgs.python312Packages.callPackage ./webgui-jupyter-widget.nix { inherit webgui;};
           };
 
           formatter = pkgs.nixfmt-rfc-style;

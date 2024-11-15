@@ -3,10 +3,16 @@
   fetchFromGitHub,
   lib,
   jupyter-packaging,
+  jupyterlab,
+  jupyter,
   setuptools,
   packaging,
-  webgui,
   yarnConfigHook,
+  fetchYarnDeps,
+  nodejs,
+  numpy,
+  jupyterlab-widgets,
+  ipywidgets,
 }:
 
 buildPythonPackage rec {
@@ -18,16 +24,52 @@ buildPythonPackage rec {
     owner = "CERBSim";
     repo = "webgui_jupyter_widgets";
     rev = "4d5b097a69c3a629a09871de340a853cd499bd30";
-    hash = "sha256-ppiytTfySqiWFjCjdQoXXqa9iUqyyuhpKJawQO9IhZ8=";
+    hash = "sha256-KcKDIfPGVyaByTMuOqXOCVIGfQpT5HHiJY+CAZpKwKU=";
+    fetchSubmodules = true;
   };
 
-  build-system = [ setuptools jupyter-packaging ];
-
-  dependencies = [
-    packaging
-    webgui
+  patches = [
+    ./setup.patch
   ];
 
+  preConfigure = ''
+    echo "building submodule webgui"
+    cd webgui
+    yarnOfflineCache=$webguiYarnOfflineCache runHook yarnConfigHook
+    yarn --offline build
+    cd -
+  '';
+
+  webguiYarnOfflineCache = fetchYarnDeps {
+    yarnLock = src + "/webgui/yarn.lock";
+    hash = "sha256-dW5zbNOpawF64LAaHly02Xgsa8C4seFIXBJLwd8BTVo=";
+  };
+
+  yarnOfflineCache = fetchYarnDeps {
+    yarnLock = src + "/yarn.lock";
+    hash = "sha256-d6s8U7seUO1HWttxJV+1SosnAI6D4xlS5XSObOk3ezo=";
+  };
+
+  preBuild = ''
+    export PATH=${jupyter}/bin:$PATH
+    yarn --offline build:prod
+  '';
+
+  build-system = [
+    nodejs
+    setuptools
+    jupyter
+    jupyter-packaging
+    yarnConfigHook
+  ];
+
+  dependencies = [
+    numpy
+    jupyterlab
+    packaging
+    jupyterlab-widgets
+    ipywidgets
+  ];
 
   pythonImportsCheck = [ "webgui_jupyter_widgets" ];
 

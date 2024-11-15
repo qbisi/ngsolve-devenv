@@ -1,0 +1,24 @@
+diff --git a/pyproject.toml b/pyproject.toml
+index 498df1e..5e387b3 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,3 +1,3 @@
+ [build-system]
+-requires = ["jupyter_packaging==0.7.9", "jupyterlab==3.*", "setuptools>=40.8.0", "wheel"]
++requires = ["jupyter_packaging>=0.7.9", "jupyterlab>=3.0", "setuptools>=40.8.0", "wheel"]
+ build-backend = "setuptools.build_meta"
+diff --git a/setup.py b/setup.py
+index 205738a..1755254 100644
+--- a/setup.py
++++ b/setup.py
+@@ -86,8 +86,8 @@ is_dev_build = bool(os.environ.get('DEV_BUILD', False))
+ cmdclass = create_cmdclass('jsdeps', package_data_spec=package_data_spec,
+     data_files_spec=data_files_spec)
+ cmdclass['jsdeps'] = combine_commands(
+-    install_npm(webgui_dir, build_cmd='build' if not is_dev_build else 'build-dev'),
+-    install_npm(HERE, build_cmd='build:prod' if not is_dev_build else 'build'),
++    #install_npm(webgui_dir, build_cmd='build' if not is_dev_build else 'build-dev', npm=["yarn","--offline","--frozen-lockfile"]),
++    #install_npm(HERE, build_cmd='build:prod' if not is_dev_build else 'build', npm=["yarn","--offline","--frozen-lockfile"]),
+     ensure_targets(jstargets),
+     generate_webgui_js,
+ )

@@ -14,16 +14,21 @@ mkYarnPackage rec {
     hash = "sha256-WRxkAml/ReoQ4HJyvDmzGn7zC+PGGjo9UVlz70PbKAc=";
   };
 
-  # packageJSON = ./package.json;
+  packageJSON = src + "/package.json";
 
   offlineCache = fetchYarnDeps {
-    yarnLock = "${src}/yarn.lock";
+    yarnLock = src + "/yarn.lock";
     hash = "sha256-dW5zbNOpawF64LAaHly02Xgsa8C4seFIXBJLwd8BTVo=";
   };
-
-  # distPhase = "true";
 
   buildPhase = ''
     yarn --offline build
   '';
+
+  installPhase = ''
+    cp -r deps/webgui/dist $out
+    cp  ${packageJSON} $out/package.json
+  '';
+
+  distPhase = "true";
 }
